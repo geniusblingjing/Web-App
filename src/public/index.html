@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dream Catcher</title>
+    <link rel="stylesheet" href="style.css"> <!-- Correct relative path -->
+</head>
+<body>
+    <h1>Dream Catcher</h1>
+    <div class="controls">
+        <textarea id="dream-input" placeholder="Describe your dream here..."></textarea>
+        <button id="analyze-button">Analyze Dream</button>
+        <button id="generate-image-button">Generate Image</button>
+    </div>
+    <div id="loadingIndicator" style="display: none;">
+        <p>Loading...</p>
+        <!-- Feel free to replace the paragraph with an animated spinner or other graphic -->
+    </div>
+    <div id="output-box" style="display: none;"> <!-- Initially hidden -->
+        <p>Results will appear here...</p>
+    </div>
+    
+    <div id="results-container"></div>
+    <script src="app.js"></script> <!-- Load app.js before inline script -->
+    <script>
+        document.getElementById('analyze-button').addEventListener('click', function() {
+            var dreamText = document.getElementById('dream-input').value;
+            analyzeDream(dreamText);
+        });
+        
+        async function analyzeDream(dreamDescription) {
+            try {
+                const response = await fetch('/analyzeDream', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ dream: dreamDescription })
+                });
+        
+                if (!response.ok) {
+                    throw new Error('Network response was not ok.');
+                }
+        
+                const data = await response.json();
+                displayResults(data.analysis);
+            } catch (error) {
+                console.error('Failed to fetch:', error);
+                displayResults('Error: ' + error.message);
+            }
+        }
+        
+        function displayResults(result) {
+            const resultsContainer = document.getElementById('results-container');
+            resultsContainer.innerHTML = `<p>${result}</p>`;
+        }
+    </script>
+</body>
+</html>
